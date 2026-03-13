@@ -17,6 +17,97 @@
             padding: 0;
         }
 
+        /* =========================================
+           MACOS STYLE WINDOW WRAPPER 
+           ========================================= */
+        .embed-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4rem;
+            padding: 2rem 1rem 8rem 1rem;
+        }
+
+        .mac-window {
+            width: 100%;
+            max-width: 1000px;
+            background-color: #121212;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            container-type: inline-size;
+            /* 👈 This enables the magic scaling */
+        }
+
+        .mac-header {
+            height: 40px;
+            background: #1e1e1e;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .mac-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .mac-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .mac-dot.close {
+            background-color: #ff5f56;
+        }
+
+        .mac-dot.minimize {
+            background-color: #ffbd2e;
+        }
+
+        .mac-dot.maximize {
+            background-color: #27c93f;
+        }
+
+        .mac-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* 👈 NEW: The wrapper that holds the perfect screen ratio */
+        .iframe-wrapper {
+            width: 100%;
+            aspect-ratio: 1280 / 800;
+            position: relative;
+            overflow: hidden;
+            background-color: #b8ceee;
+            /* Matches CRM background to prevent flashes */
+        }
+
+        /* 👈 UPDATED: Forces desktop view, then shrinks it */
+        .app-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1280px;
+            /* Force beautiful desktop width */
+            height: 800px;
+            /* Force beautiful desktop height */
+            border: none;
+            display: block;
+            transform-origin: top left;
+            /* The math that scales it down to fit the container perfectly */
+            transform: scale(calc(100cqw / 1280));
+        }
+
         /* --- CUSTOM SCROLLBARS FOR EMBED --- */
         ::-webkit-scrollbar {
             width: 8px;
