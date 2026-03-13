@@ -17,8 +17,31 @@
             padding: 0;
         }
 
-        html {
-            scroll-behavior: smooth;
+        /* --- CUSTOM SCROLLBARS FOR EMBED --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(30, 50, 100, 0.15);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(30, 50, 100, 0.3);
+        }
+
+        html,
+        body {
+            height: 100%;
+            /* Forces exact height of the iframe */
+            overflow: hidden;
+            /* Prevents double scrollbars */
             font-size: 13px;
         }
 
@@ -51,10 +74,7 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 45%, var(--bg-c) 100%);
-            background-attachment: fixed;
             color: var(--ink);
-            overflow-x: hidden;
-            min-height: 100vh;
         }
 
         body::after {
@@ -69,16 +89,19 @@
                 radial-gradient(ellipse 45% 45% at 65% 8%, rgba(255, 255, 255, 0.32) 0%, transparent 60%);
         }
 
+        /* FLEX APP CONTAINER */
         .page-root {
             position: relative;
             z-index: 1;
-            min-height: 100vh;
+            height: 100%;
             display: flex;
             flex-direction: column;
         }
 
         /* TOPBAR */
         .topbar {
+            flex-shrink: 0;
+            /* Prevents topbar from squishing */
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -127,34 +150,38 @@
             background: rgba(255, 255, 255, 0.5);
         }
 
-        /* CONTENT GRID */
+        /* CONTENT GRID - FLEX HEIGHT */
         .content-area {
             display: grid;
             grid-template-columns: 340px 1fr;
             gap: 0;
             flex: 1;
-            padding: 20px 28px 32px;
-            align-items: start;
+            /* Takes exactly remaining space */
             min-height: 0;
+            /* Critical for flex scrolling */
+            padding: 20px 28px;
+            align-items: stretch;
+            overflow: hidden;
         }
 
         /* DECK COL */
         .deck-col {
-            position: sticky;
-            top: 20px;
             display: flex;
             flex-direction: column;
-            align-items: stretch;
             padding-right: 24px;
         }
 
         .folder-container {
             display: flex;
+            overflow: hidden;
             flex-direction: column;
+            flex: 1;
+            min-height: 0;
             filter: drop-shadow(0 8px 32px rgba(30, 50, 100, 0.13));
         }
 
         .folder-tab {
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -195,17 +222,20 @@
         }
 
         .folder-body-table {
+            flex: 1;
+            /* Takes exactly remaining folder space */
+            min-height: 0;
+            /* Allows internal scrolling */
             background: rgba(255, 255, 255, 0.42);
             backdrop-filter: blur(28px) saturate(170%);
             border: 1px solid rgba(255, 255, 255, 0.82);
             border-radius: 0 0 16px 16px;
             overflow: auto;
-            -webkit-overflow-scrolling: touch;
+            /* Scroll ONLY the table inside */
             box-shadow: 0 2px 0 rgba(255, 255, 255, 0.6) inset;
             position: relative;
             z-index: 1;
             cursor: grab;
-            max-height: calc(100vh - 168px);
         }
 
         .folder-body-table:active {
@@ -320,9 +350,13 @@
 
         /* TABLE COL */
         .table-col {
+            display: flex;
+            flex-direction: column;
             min-width: 0;
             border-left: 1px solid rgba(255, 255, 255, 0.4);
             padding-left: 24px;
+            overflow: hidden;
+            min-height: 0;
         }
 
         /* TABLE */
@@ -349,8 +383,10 @@
             white-space: nowrap;
             position: sticky;
             top: 0;
-            background: rgba(235, 242, 255, 0.75);
+            background: rgba(235, 242, 255, 0.85);
             backdrop-filter: blur(12px);
+            z-index: 20;
+            /* Keeps header above rows */
         }
 
         tbody tr {
@@ -1351,23 +1387,32 @@
             gap: 8px;
         }
 
-        /* RESPONSIVE */
-        @media (max-width: 1100px) {
-            .content-area {
-                grid-template-columns: 300px 1fr;
-            }
-        }
-
+        /* RESPONSIVE - MOBILE EMBEDS */
         @media (max-width: 900px) {
+
+            html,
+            body {
+                height: auto;
+                overflow-y: auto;
+                /* Release body scroll for mobile vertical stacking */
+            }
+
+            .page-root {
+                height: auto;
+                min-height: 100vh;
+            }
+
             .content-area {
-                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
                 padding: 16px 16px 40px;
                 gap: 24px;
             }
 
             .deck-col {
-                position: static;
                 padding-right: 0;
+                overflow: hidden;
+                min-height: 0;
             }
 
             .table-col {
@@ -1391,6 +1436,7 @@
 
             .folder-body-table {
                 max-height: 60vh;
+                display: block;
             }
 
             .deck-dots {
@@ -1478,7 +1524,6 @@
             </div>
         </div>
 
-        <!-- FILTER POPUP -->
         <div class="filter-overlay" id="filterOverlay" onclick="handleOverlayClick(event)">
             <div class="filter-panel" id="filterPanel">
                 <h3>Filter Contacts</h3>
@@ -1793,7 +1838,6 @@
             document.getElementById('filterOverlay').classList.remove('open');
         }
 
-        // Dynamically build assigned chips from unique assignees in contacts
         function rebuildAssignedChips() {
             const assignees = [...new Set(contacts.map(c => c.assigned).filter(Boolean))].sort();
             const wrap = document.getElementById('assignedChips');
